@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Solco</title>
+<link rel="icon" href="/public/logo.svg">
+<link rel="stylesheet" href="/public/style.css">
+</head>
+<body>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="logo"><img src="/public/logo.svg" alt="" width="24" height="24"></span>
+      Solco
+    </div>
+    <button class="nav-btn active" data-route="home"><span class="ic"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></span>Home</button>
+    <button class="nav-btn" data-route="artisti"><span class="ic"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></span>Artisti</button>
+    <button class="nav-btn" data-route="preferiti"><span class="ic"><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.7-9.5-8.7C.8 8.9 2.6 5 6.2 5c2 0 3.3 1.1 4 2 .7-.9 2-2 4-2 3.6 0 5.4 3.9 3.7 7.3C19.5 16.3 12 21 12 21z"/></svg></span>Preferiti</button>
+    <button class="nav-btn" data-route="radio"><span class="ic"><svg viewBox="0 0 24 24"><path d="M3.24 6.15C2.51 6.43 2 7.17 2 8v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2H8.3l8.26-3.34L15.88 1 3.24 6.15zM7 20c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm13-8h-2v-2h-2v2H4V8h16v4z"/></svg></span>Radio Solco</button>
+    <button class="nav-btn" id="importBtn"><span class="ic"><svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></span>Indicizza musica</button>
+    <button class="nav-btn" id="aiSettingsBtn"><span class="ic"><svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.5.5 0 00.12-.64l-1.92-3.32a.5.5 0 00-.61-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.5.5 0 00-.5-.42h-3.84a.5.5 0 00-.5.42l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.5.5 0 00-.61.22L2.74 8.84a.5.5 0 00.12.64l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.5.5 0 00-.12.64l1.92 3.32c.12.22.39.3.61.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.25.42.5.42h3.84c.25 0 .46-.18.5-.42l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.23.09.49 0 .61-.22l1.92-3.32a.5.5 0 00-.12-.64l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg></span>Impostazioni IA</button>
+    <div class="search-wrap">
+      <span class="ic"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></span>
+      <input id="searchInput" type="text" placeholder="Cerca musica..." autocomplete="off" role="combobox" aria-expanded="false" aria-controls="quickResults">
+    </div>
+    <div id="quickResults" class="quick-results hidden" role="listbox"></div>
+    <div class="pl-header">
+      <span>Playlist</span>
+      <button id="aiPlaylistBtn" class="mini-btn" title="Crea playlist con l'IA"><svg viewBox="0 0 24 24"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8L12 2zM19 14l.9 2.6L22.5 17.5l-2.6.9L19 21l-.9-2.6-2.6-.9 2.6-.9L19 14zM5 14l.9 2.6L8.5 17.5l-2.6.9L5 21l-.9-2.6-2.6-.9 2.6-.9L5 14z"/></svg></button>
+      <button id="newPlaylistBtn" class="mini-btn" title="Nuova playlist"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></button>
+    </div>
+    <ul id="playlistList" class="pl-list"></ul>
+    <div class="sidebar-foot">
+      Gli album indicizzati restano nel drive originale
+    </div>
+  </aside>
+
+  <main id="view"></main>
+</div>
+
+<footer class="player">
+  <div class="now">
+    <div id="nowCover" class="cover small"></div>
+    <div class="now-meta">
+      <div id="nowTitle">Nessun brano in riproduzione</div>
+      <div id="nowArtist"></div>
+    </div>
+  </div>
+  <div class="controls">
+    <div class="ctrl-row">
+      <button id="shuffleBtn" class="ctrl" title="Riproduzione casuale"><svg viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg></button>
+      <button id="prevBtn" class="ctrl" title="Precedente"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
+      <button id="playBtn" class="ctrl big" title="Riproduci/Pausa (spazio)"><svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+      <button id="nextBtn" class="ctrl" title="Successivo"><svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zM6 6l8.5 6L6 18z"/></svg></button>
+      <button id="repeatBtn" class="ctrl" title="Ripeti"><svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg></button>
+    </div>
+    <div class="progress-row">
+      <span id="cur">0:00</span>
+      <input id="seek" type="range" min="0" max="1000" value="0" step="1">
+      <span id="dur">0:00</span>
+    </div>
+  </div>
+  <div class="right">
+    <button id="queueBtn" class="ctrl" title="Coda"><svg viewBox="0 0 24 24"><path d="M15 6H3v2h12V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zm17.5-4.5L23 9.5V19c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2v-5.5z"/></svg></button>
+    <button id="lyricsBtn" class="ctrl" title="Testo del brano"><svg viewBox="0 0 24 24"><path d="M4 4h16v2H4zm0 5h16v2H4zm0 5h10v2H4zm0 5h7v2H4z"/></svg></button>
+    <button id="volBtn" class="ctrl" title="Volume"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg></button>
+    <input id="vol" type="range" min="0" max="1" step="0.01" value="0.8" title="Volume">
+  </div>
+</footer>
+
+<div id="queuePanel" class="panel hidden">
+  <div class="panel-head">
+    <h3>Coda di riproduzione</h3>
+    <button id="clearQueueBtn" class="mini-btn" title="Svuota coda"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>
+  </div>
+  <div id="queueList"></div>
+</div>
+
+<div id="lyricsPanel" class="panel hidden">
+  <div class="panel-head">
+    <h3>Testo</h3>
+    <span id="lyricsSource" class="panel-note"></span>
+  </div>
+  <div id="lyricsList"></div>
+</div>
+
+<div id="modal" class="hidden">
+  <div class="modal-box">
+    <h3 id="modalTitle">Aggiungi a playlist</h3>
+    <p id="modalLabel" class="modal-label"></p>
+    <select id="modalSelect"></select>
+    <div class="modal-new">
+      <input id="modalNewName" type="text" placeholder="Nome nuova playlist..." autocomplete="off">
+      <button id="modalAddBtn" class="btn">Aggiungi</button>
+    </div>
+    <button id="modalClose" class="btn ghost">Annulla</button>
+  </div>
+</div>
+
+<div id="genreModal" class="hidden">
+  <div class="modal-box">
+    <h3>Modifica genere</h3>
+    <p id="genreAlbumLabel" class="modal-label"></p>
+    <input id="genreInput" type="text" maxlength="500" placeholder="Es. Rock, Blues, Jazz" autocomplete="off">
+    <p class="hint">Puoi inserire più generi separandoli con una virgola.</p>
+    <button id="genreSave" class="btn">Salva</button>
+    <button id="genreReset" class="btn ghost hidden">Ripristina dai tag</button>
+    <button id="genreClose" class="btn ghost">Annulla</button>
+  </div>
+</div>
+
+<div id="importModal" class="hidden">
+  <div class="modal-box wide">
+    <h3>Aggiungi musica alla biblioteca</h3>
+    <div class="tabs">
+      <button class="tab active" data-tab="disk">Indicizza cartella o drive</button>
+      <button class="tab" data-tab="upload">Copia tramite browser</button>
+      <button class="tab" data-tab="sources">Cartelle indicizzate</button>
+    </div>
+
+    <div id="tab-disk" class="tab-body">
+      <div class="path-row">
+        <input id="impPath" type="text" placeholder="Percorso di una cartella sul PC..." autocomplete="off">
+        <button id="impGo" class="btn small">Apri</button>
+      </div>
+      <div id="impDrives" class="drive-row"></div>
+      <div id="impDirs" class="dir-list"></div>
+      <div id="impResult" class="imp-result"></div>
+      <button id="impAllBtn" class="btn">Indicizza questa cartella</button>
+      <p class="hint">I file audio e le copertine vengono letti direttamente dalla posizione attuale: non viene creata alcuna copia. Il drive dovrà essere collegato per riprodurre gli album.</p>
+    </div>
+
+    <div id="tab-upload" class="tab-body hidden">
+      <div id="dropZone" class="dropzone">
+        <strong>Trascina qui cartelle o file audio</strong>
+        <div class="dz-btns">
+          <button id="pickFolder" class="btn small">Scegli cartella</button>
+          <button id="pickFiles" class="btn small ghost">Scegli file</button>
+        </div>
+        <div class="hint">formati: mp3, flac, m4a, ogg, wav, aac, opus</div>
+      </div>
+      <p class="hint">Questa modalità copia i file nella cartella locale <code>music/</code>. Per lasciare l’archivio sul drive usa la scheda “Indicizza cartella o drive”.</p>
+      <input type="file" id="fileFolder" webkitdirectory multiple hidden>
+      <input type="file" id="fileFiles" multiple hidden>
+      <div class="path-row" style="margin-top:10px;">
+        <input id="upAlbum" type="text" value="Album importato" autocomplete="off">
+      </div>
+      <div class="up-bar"><div id="upBarFill"></div></div>
+      <div id="upText"></div>
+      <button id="upStartBtn" class="btn" disabled>Importa</button>
+    </div>
+
+    <div id="tab-sources" class="tab-body hidden">
+      <div id="srcList" class="dir-list"></div>
+      <div id="srcResult" class="imp-result"></div>
+      <p class="hint"><strong>Rimuovi</strong> toglie la cartella dall&rsquo;elenco ma tiene da parte i metadati gi&agrave; letti: se la reinserisci, gli album ricompaiono subito. <strong>Dimentica</strong> butta via anche quelli, l&rsquo;analisi audio dei suoi brani e le copertine che restano senza album, utile per una cartella che non tornerà (per esempio un percorso di un altro sistema). Nessuna delle due tocca i file musicali.</p>
+    </div>
+
+    <button id="importClose" class="btn ghost">Chiudi</button>
+  </div>
+</div>
+
+<div id="aiSettingsModal" class="hidden">
+  <div class="modal-box">
+    <h3>Impostazioni IA</h3>
+    <p class="hint">Vale per le schede di approfondimento e per le playlist generate con l'IA.</p>
+
+    <label class="field-label">Fornitore
+      <select id="aiProviderSelect">
+        <option value="lmstudio">Locale (LM Studio)</option>
+        <option value="openrouter">OpenRouter (cloud)</option>
+      </select>
+    </label>
+
+    <div id="aiProviderLmstudio">
+      <p class="hint">Usa il modello caricato in LM Studio su questo PC. Gratuito, ma limitato dalla potenza del tuo hardware e dal contesto del modello caricato.</p>
+    </div>
+
+    <div id="aiProviderOpenrouter" class="hidden">
+      <p class="hint">Servizio a pagamento: ogni richiesta ha un costo, mostrato accanto a ciascun modello. La chiave resta solo su questo PC, non viene mai rimandata al browser dopo il salvataggio.</p>
+      <label class="field-label">Chiave API
+        <input id="aiOpenRouterKey" type="password" placeholder="sk-or-... (lascia vuoto per non cambiarla)" autocomplete="off">
+      </label>
+      <div class="btn-row">
+        <button id="aiVerifyBtn" class="btn ghost small">Verifica chiave</button>
+        <span id="aiVerifyResult" class="hint"></span>
+      </div>
+      <label class="field-label">Modello
+        <input id="aiOpenRouterFilter" type="text" placeholder="Filtra per nome..." autocomplete="off">
+        <select id="aiOpenRouterModel" size="8"></select>
+      </label>
+      <p id="aiOpenRouterModelInfo" class="hint"></p>
+    </div>
+
+    <div class="btn-row">
+      <button id="aiSettingsSaveBtn" class="btn">Salva</button>
+      <button id="aiSettingsCloseBtn" class="btn ghost">Annulla</button>
+    </div>
+
+    <hr class="sep">
+
+    <h3>Analisi del suono</h3>
+    <p class="hint">Serve per le playlist basate sull'atmosfera ("notturni", "malinconici", "strumentali"): analizza il suono reale dei brani, non i tag. Una tantum, poi solo sui brani nuovi. Richiede <code>ffmpeg</code> installato.</p>
+    <div id="analisiStato" class="hint"></div>
+    <div class="up-bar"><div id="analisiBarra"></div></div>
+    <div class="btn-row">
+      <button id="analisiAvviaBtn" class="btn">Avvia analisi</button>
+      <button id="analisiFermaBtn" class="btn ghost hidden">Interrompi</button>
+    </div>
+  </div>
+</div>
+
+<div id="aiPlaylistModal" class="hidden">
+  <div class="modal-box wide">
+    <h3>Crea playlist con l'IA</h3>
+
+    <div id="aiPlaylistForm">
+      <p class="hint">Descrivi la playlist che vuoi ottenere: artista, genere, anno, durata, atmosfera...</p>
+      <textarea id="aiPlaylistPrompt" rows="3" placeholder="Es. 12 brani tra i più noti di Ryan Adams"></textarea>
+      <p class="hint">Le richieste basate sull'atmosfera (es. "notturno", "malinconico", "strumentale") usano l'analisi del suono reale dei brani: va avviata una volta da Impostazioni IA.</p>
+      <div class="btn-row">
+        <button id="aiPlaylistGoBtn" class="btn">Genera</button>
+        <button id="aiPlaylistCloseBtn1" class="btn ghost">Annulla</button>
+      </div>
+    </div>
+
+    <div id="aiPlaylistLoading" class="hidden">
+      <div class="web-loading"><span class="web-spinner"></span>Sto scegliendo i brani…</div>
+    </div>
+
+    <div id="aiPlaylistError" class="hidden">
+      <div class="web-error"><strong>Non sono riuscito a generare la playlist</strong><p id="aiPlaylistErrorText"></p></div>
+      <div class="btn-row">
+        <button id="aiPlaylistBackBtn" class="btn ghost">Torna indietro</button>
+      </div>
+    </div>
+
+    <div id="aiPlaylistPreview" class="hidden">
+      <div class="path-row">
+        <input id="aiPlaylistName" type="text" placeholder="Nome della playlist" autocomplete="off">
+      </div>
+      <p id="aiPlaylistNote" class="hint"></p>
+      <div id="aiPlaylistWarnings"></div>
+      <div id="aiPlaylistTracks" class="tracklist"></div>
+      <div class="btn-row">
+        <button id="aiPlaylistCreateBtn" class="btn">Crea playlist</button>
+        <button id="aiPlaylistRetryBtn" class="btn ghost">Riprova</button>
+        <button id="aiPlaylistCloseBtn2" class="btn ghost">Annulla</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="/public/app.js"></script>
+</body>
+</html>

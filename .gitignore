@@ -1,0 +1,21 @@
+node_modules/
+
+# Cache rigenerabili
+cache/
+web-cache.json
+
+# Configurazione e dati locali. La chiave OpenRouter non sta piu' qui:
+# vive nella cartella di configurazione utente (vedi ai-config.js).
+ai-config.json
+stats.json
+playlists.json
+radio-solco.json
+library.json
+album-overrides.json
+
+# Musica dell'utente
+music/
+
+# Sistema
+.DS_Store
+desktop.ini

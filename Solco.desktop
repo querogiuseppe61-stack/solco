@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Solco
+Comment=Ascolta la tua collezione di album
+Exec=/bin/bash /home/pippo/Scrivania/Solco/avvia-solco.sh
+Path=/home/pippo/Scrivania/Solco
+Icon=/home/pippo/Scrivania/Solco/public/logo-512.png
+Terminal=true
+Categories=AudioVideo;Audio;Player;
+StartupNotify=false
