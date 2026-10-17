@@ -9,6 +9,7 @@
   "scripts": {
     "start": "node server.js"
   },
+  "license": "MIT",
   "private": true,
   "dependencies": {
     "essentia.js": "^0.1.3",

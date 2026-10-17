@@ -4,8 +4,50 @@
 # Dal terminale, nella cartella dell'app:
 #   chmod +x avvia-solco.sh   (la prima volta soltanto)
 #   ./avvia-solco.sh
+#
+# Per aggiungere Solco al menu delle applicazioni (con i percorsi di questa cartella):
+#   ./avvia-solco.sh --installa
 
 cd "$(dirname "$0")" || exit 1
+
+# Genera il lanciatore dal modello Solco.desktop sostituendo @SOLCO_DIR@ con la
+# cartella attuale. Se l'app viene spostata, basta rilanciare --installa.
+installa_lanciatore() {
+  local dir dest stringa comando riga
+  dir="$(pwd)"
+  dest="${XDG_DATA_HOME:-$HOME/.local/share}/applications/solco.desktop"
+
+  # Nei valori del file .desktop la barra rovesciata va raddoppiata; dentro Exec,
+  # inoltre, il percorso sta tra virgolette, dove " ` $ \ vanno protetti e % raddoppiato.
+  stringa="${dir//\\/\\\\}"
+  comando="${dir//\\/\\\\}"
+  comando="${comando//\"/\\\"}"
+  comando="${comando//\`/\\\`}"
+  comando="${comando//\$/\\\$}"
+  comando="${comando//\\/\\\\}"
+  comando="${comando//%/%%}"
+
+  mkdir -p "$(dirname "$dest")" || return 1
+  {
+    while IFS= read -r riga || [ -n "$riga" ]; do
+      case "$riga" in
+        '#'*) continue ;;
+        Exec=*) printf '%s\n' "${riga//@SOLCO_DIR@/"$comando"}" ;;
+        *) printf '%s\n' "${riga//@SOLCO_DIR@/"$stringa"}" ;;
+      esac
+    done < Solco.desktop
+  } > "$dest" || return 1
+  chmod +x "$dest"
+  command -v update-desktop-database >/dev/null 2>&1 &&
+    update-desktop-database "$(dirname "$dest")" >/dev/null 2>&1
+  echo "Lanciatore installato in $dest"
+  echo "Solco ora compare nel menu delle applicazioni."
+}
+
+if [ "$1" = "--installa" ]; then
+  installa_lanciatore
+  exit $?
+fi
 
 PORT="${PORT:-3747}"
 URL="http://localhost:$PORT"

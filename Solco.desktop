@@ -1,11 +1,14 @@
+# Modello del lanciatore per Linux: i percorsi @SOLCO_DIR@ vengono sostituiti
+# da "./avvia-solco.sh --installa", che scrive il lanciatore pronto in
+# ~/.local/share/applications/solco.desktop. Non usare questo file direttamente.
 [Desktop Entry]
 Version=1.0
 Type=Application
 Name=Solco
 Comment=Ascolta la tua collezione di album
-Exec=/bin/bash /home/pippo/Scrivania/Solco/avvia-solco.sh
-Path=/home/pippo/Scrivania/Solco
-Icon=/home/pippo/Scrivania/Solco/public/logo-512.png
+Exec=/bin/bash "@SOLCO_DIR@/avvia-solco.sh"
+Path=@SOLCO_DIR@
+Icon=@SOLCO_DIR@/public/logo-512.png
 Terminal=true
 Categories=AudioVideo;Audio;Player;
 StartupNotify=false

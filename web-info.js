@@ -106,8 +106,18 @@ function createWebInfoService(options) {
     }
   }
 
+  // Scrittura su file temporaneo e rinomina, cosi' un'interruzione non lascia
+  // web-cache.json troncato; a ogni salvataggio si tolgono le voci scadute,
+  // altrimenti il file crescerebbe per sempre.
   function saveCache(cache) {
-    fs.writeFileSync(cacheFile, JSON.stringify(cache, null, 2));
+    const now = Date.now();
+    const entries = {};
+    for (const [key, entry] of Object.entries(cache.entries || {})) {
+      if (entry && now - entry.savedAt < CACHE_TTL) entries[key] = entry;
+    }
+    const tmp = cacheFile + '.tmp';
+    fs.writeFileSync(tmp, JSON.stringify({ ...cache, entries }, null, 2));
+    fs.renameSync(tmp, cacheFile);
   }
 
   function cached(key, refresh) {
@@ -121,6 +131,12 @@ function createWebInfoService(options) {
     cache.entries[key] = { savedAt: Date.now(), value };
     saveCache(cache);
     return value;
+  }
+
+  // Una sintesi IA fallita (timeout, errore del provider) non va tenuta per 7
+  // giorni: la scheda si restituisce lo stesso, ma alla prossima apertura si riprova.
+  function rememberUnlessAiFailed(key, value) {
+    return value.ai && value.ai.failed ? value : remember(key, value);
   }
 
   async function fetchJson(url, init, timeoutMs) {
@@ -397,6 +413,7 @@ function createWebInfoService(options) {
       ], { temperature: 0.2, maxTokens: 700, timeoutMs: 180000 });
       return {
         used: !!text,
+        failed: !text,
         model: status.model,
         provider: status.provider,
         message: text ? 'Sintesi generata con ' + status.provider : status.message,
@@ -405,6 +422,7 @@ function createWebInfoService(options) {
     } catch (e) {
       return {
         used: false,
+        failed: true,
         model: status.model,
         provider: status.provider,
         message: 'Il modello (' + status.provider + ') non ha risposto: ' + e.message,
@@ -501,7 +519,7 @@ function createWebInfoService(options) {
         ],
         fetchedAt: new Date().toISOString()
       };
-      return musicBrainzError ? value : remember(key, value);
+      return musicBrainzError ? value : rememberUnlessAiFailed(key, value);
     }
     const details = await lookupReleaseGroup(found.id);
     const wiki = await wikipediaSearch(album.title + ' ' + album.artist);
@@ -521,7 +539,7 @@ function createWebInfoService(options) {
       wikipedia: wiki && wiki.extract || ''
     };
     const ai = await aiSummary('album musicale', facts, wiki && wiki.extract);
-    return remember(key, {
+    return rememberUnlessAiFailed(key, {
       match: {
         id: details.id,
         title: details.title,
@@ -586,7 +604,7 @@ function createWebInfoService(options) {
         ],
         fetchedAt: new Date().toISOString()
       };
-      return musicBrainzError ? value : remember(key, value);
+      return musicBrainzError ? value : rememberUnlessAiFailed(key, value);
     }
     const details = await lookupArtist(found.id);
     const discography = await browseDiscography(found.id);
@@ -608,7 +626,7 @@ function createWebInfoService(options) {
       discografia: discography.items.slice(0, 40).map((item) => ({ anno: item.year, titolo: item.title, tipo: item.primaryType }))
     };
     const ai = await aiSummary('artista musicale', facts, wiki && wiki.extract);
-    return remember(key, {
+    return rememberUnlessAiFailed(key, {
       id: details.id,
       name: details.name,
       sortName: details['sort-name'],

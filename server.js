@@ -1699,6 +1699,22 @@ try {
   console.error('Impossibile spostare la chiave OpenRouter:', err.message);
 }
 
+// Errori di avvio (porta occupata, indirizzo non valido, permessi): un messaggio
+// leggibile al posto dello stack trace di Node.
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error('La porta ' + PORT + ' è già in uso su ' + HOST + ': forse Solco è già avviato?');
+    console.error('Apri http://localhost:' + PORT + ' nel browser, oppure avvia su un’altra porta (es. PORT=3748).');
+  } else if (err.code === 'EACCES') {
+    console.error('Permesso negato per la porta ' + PORT + ': scegli una porta sopra la 1024 con PORT=...');
+  } else if (err.code === 'EADDRNOTAVAIL') {
+    console.error('L’indirizzo ' + HOST + ' non è disponibile su questa macchina: controlla SOLCO_HOST.');
+  } else {
+    console.error('Impossibile avviare il server: ' + err.message);
+  }
+  process.exit(1);
+});
+
 server.listen(PORT, HOST, async () => {
   try {
     const started = Date.now();
