@@ -104,6 +104,18 @@ Questi file vengono creati nella cartella dell'app e sono esclusi da git:
 `album-overrides.json`, `ai-config.json`, `web-cache.json` e la cartella `cache/`
 (indice dei metadati, copertine, risultati dell'analisi audio, modelli scaricati).
 
+## Test
+
+```bash
+npm test
+```
+
+I test usano il test runner integrato in Node (`node:test`) e non richiedono
+dipendenze in più, né ffmpeg, né i modelli Essentia, né la rete. Quelli
+d'integrazione avviano il server su una copia temporanea dell'app con una piccola
+libreria di file WAV generati al volo, quindi non toccano `music/` né i file
+locali. GitHub Actions li esegue a ogni push su Linux, Windows e macOS.
+
 ## Modelli Essentia e licenza
 
 Al primo utilizzo dell'analisi audio Solco scarica da
