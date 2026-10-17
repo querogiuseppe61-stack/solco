@@ -62,6 +62,8 @@ function decodeSegmento(file, start, dur, tmpFile) {
   try {
     execFileSync(ffmpeg, args, { stdio: 'ignore', timeout: 60000 });
   } catch (e) {
+    // ffmpeg puo' aver gia' scritto un pezzo di file prima di fallire
+    try { fs.unlinkSync(tmpFile); } catch (e2) {}
     // il messaggio grezzo di execFileSync riporta l'intera riga di comando: inutile
     // da mostrare in interfaccia, meglio dire cosa e' successo davvero
     throw new Error('decodifica non riuscita (file danneggiato o formato non supportato)');

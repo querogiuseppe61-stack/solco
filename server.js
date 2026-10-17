@@ -1184,19 +1184,25 @@ function handleUpload(req, res, q) {
   if (!parts) return json(res, 400, { error: 'Percorso non valido' });
   const file = path.join(MUSIC_DIR, ...parts);
   fs.mkdirSync(path.dirname(file), { recursive: true });
-  const out = fs.createWriteStream(file);
-  req.pipe(out);
-  out.on('finish', () => {
+  // Si scrive su un file a parte e lo si rinomina solo a caricamento finito: un
+  // invio interrotto lasciava in music/ un brano troncato, che finiva in libreria.
+  const part = file + '.part';
+  pipeline(req, fs.createWriteStream(part), (err) => {
+    if (!err) {
+      try {
+        fs.renameSync(part, file);
+      } catch (e) {
+        err = e;
+      }
+    }
+    if (err) {
+      try {
+        fs.unlinkSync(part);
+      } catch (e) {}
+      return json(res, 500, { error: err.message });
+    }
     invalidateAlbumCache();
     json(res, 200, { ok: true, file: parts.join('/') });
-  });
-  out.on('error', (err) => {
-    req.destroy();
-    if (!res.headersSent) json(res, 500, { error: err.message });
-    else res.end();
-  });
-  req.on('error', () => {
-    out.destroy();
   });
 }
 

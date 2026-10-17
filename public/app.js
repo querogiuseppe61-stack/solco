@@ -72,8 +72,10 @@ function placeholderArt(album) {
     '<stop offset="1" stop-color="hsl(' + ((hue + 40) % 360) + ',60%,16%)"/>' +
     '</linearGradient></defs>' +
     '<rect width="600" height="600" fill="url(#g)"/>' +
-    '<text x="300" y="330" font-family="Arial,sans-serif" font-size="170" font-weight="bold" fill="rgba(255,255,255,.9)" text-anchor="middle">' + initials + '</text></svg>';
-  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    '<text x="300" y="330" font-family="Arial,sans-serif" font-size="170" font-weight="bold" fill="rgba(255,255,255,.9)" text-anchor="middle">' + esc(initials) + '</text></svg>';
+  // L'apostrofo resta scoperto con encodeURIComponent, e l'URL finisce anche dentro
+  // onerror="this.src='...'": un artista come "'Til Tuesday" spezzava la stringa.
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg).replace(/'/g, '%27');
 }
 
 function coverHtml(album, cls) {
