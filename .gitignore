@@ -19,3 +19,6 @@ music/
 # Sistema
 .DS_Store
 desktop.ini
+
+# Copia di lavoro annidata, non fa parte dell'app
+temp-repo/

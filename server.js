@@ -1228,6 +1228,18 @@ function hostHeaderIsLocal(value) {
   return hostnameIsLocal(parts[0]);
 }
 
+// Le GET "semplici" (<img>, <script>, link) non portano l'header Origin, quindi il
+// controllo sotto non le vede: una pagina qualunque poteva chiamare, per esempio,
+// /api/web/artist?refresh=1 e consumare crediti OpenRouter. I browser moderni
+// mandano pero' Sec-Fetch-Site, e per le API si accetta solo la nostra pagina
+// (same-origin) o l'indirizzo digitato a mano (none). "same-site" resta fuori:
+// il sito ignora la porta, e un'altra app su localhost non e' Solco. Senza
+// l'header (curl, browser vecchi) si ricade sui controlli di Host e Origin.
+function fetchSiteIsLocal(req) {
+  const site = req.headers['sec-fetch-site'];
+  return !site || site === 'same-origin' || site === 'none';
+}
+
 function requestIsLocal(req) {
   if (!hostHeaderIsLocal(req.headers.host)) return false;
   const origin = req.headers.origin;
@@ -1246,8 +1258,21 @@ const server = http.createServer(async (req, res) => {
     res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
     return res.end('Richiesta non locale');
   }
-  const u = new URL(req.url, 'http://localhost');
+  // Un percorso come "//" o "//[" non e' un URL valido: senza il try l'eccezione
+  // usciva dal gestore e faceva terminare l'intero processo.
+  let u;
+  try {
+    u = new URL(req.url, 'http://localhost');
+  } catch (e) {
+    res.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8' });
+    return res.end('Richiesta non valida');
+  }
   const p = u.pathname;
+  // Sul percorso gia' normalizzato: "/./api/..." diventa "/api/...".
+  if (p.startsWith('/api/') && !fetchSiteIsLocal(req)) {
+    res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
+    return res.end('Richiesta non locale');
+  }
   const q = Object.fromEntries(u.searchParams);
   try {
     if (p === '/api/albums') {
@@ -1293,11 +1318,9 @@ const server = http.createServer(async (req, res) => {
         const openRouterModel = String(body.openRouterModel || '').trim().slice(0, 200);
         const newKey = String(body.openRouterKey || '').trim();
         if (newKey.length > 300) return json(res, 400, { error: 'Chiave API troppo lunga' });
-        const current = aiConfig.load();
         // una chiave vuota nel corpo significa "non toccarla": l'utente non deve
         // reinserirla ogni volta che cambia solo provider o modello.
-        const openRouterKey = newKey || current.openRouterKey;
-        const saved = aiConfig.save({ provider, openRouterModel, openRouterKey });
+        const saved = aiConfig.save({ provider, openRouterModel, openRouterKey: newKey });
         return json(res, 200, {
           ok: true,
           provider: saved.provider,

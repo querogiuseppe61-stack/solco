@@ -77,11 +77,19 @@ function createAiConfigStore(settingsFile) {
     };
   }
 
+  // Una chiave assente (null o vuota) lascia com'e' quella salvata. Prima si
+  // riscriveva la chiave in uso, e se veniva da SOLCO_OPENROUTER_KEY finiva
+  // copiata su disco al primo salvataggio delle impostazioni.
   function save(cfg) {
     const provider = cfg.provider === 'openrouter' ? 'openrouter' : 'lmstudio';
     const openRouterModel = String(cfg.openRouterModel || '');
+    const nuova = String(cfg.openRouterKey || '').trim();
+    // la vecchia chiave dentro ai-config.json sparisce con la riscrittura qui
+    // sotto: se la migrazione non l'ha ancora spostata, la si mette al sicuro
+    const legacy = loadSettings().legacyKey;
+    if (nuova) writeStoredKey(nuova);
+    else if (legacy && !readStoredKey()) writeStoredKey(legacy);
     fs.writeFileSync(settingsFile, JSON.stringify({ provider, openRouterModel }, null, 2) + '\n');
-    writeStoredKey(cfg.openRouterKey || '');
     return load();
   }
 
