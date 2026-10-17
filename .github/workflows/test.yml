@@ -1,0 +1,28 @@
+name: Test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node: [22]
+        include:
+          # la versione minima dichiarata in package.json
+          - os: ubuntu-latest
+            node: 18
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      # --ignore-scripts: lo script di onnxruntime-node scarica binari che ai test
+      # non servono, perche' l'analisi audio vi gira con un worker finto
+      - run: npm ci --ignore-scripts
+      - run: npm test

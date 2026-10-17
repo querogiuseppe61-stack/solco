@@ -230,6 +230,11 @@ function createAudioFeatureService(options) {
   const cache = creaCache(path.join(cacheDir, 'audio-features.json'));
 
   let pool = [];
+  // Chiesta l'interruzione: l'analisi resta "attiva" finche' i worker non hanno
+  // finito il brano in corso e il pool non e' chiuso. Prima attivo tornava falso
+  // subito, l'interfaccia riabilitava Avvia e una nuova analisi partiva mentre la
+  // vecchia girava ancora: la chiusura di quest'ultima terminava i worker nuovi.
+  let interrotta = false;
 
   const stato = {
     attivo: false,
@@ -260,6 +265,7 @@ function createAudioFeatureService(options) {
       };
       w.on('message', onMsg);
       w.on('error', reject);
+      w.once('exit', (code) => reject(new Error('motore di analisi terminato all\'avvio (codice ' + code + ')')));
     });
     // se il worker muore la promessa di init e' gia' risolta: le richieste in volo
     // vanno comunque rifiutate, altrimenti l'analisi resta appesa per sempre
@@ -273,12 +279,18 @@ function createAudioFeatureService(options) {
       if (m.errore) pend.reject(new Error(m.errore));
       else pend.resolve(m.features);
     });
-    w.on('error', (e) => {
+    const rifiutaTutte = (e) => {
       morto = true;
-      stato.ultimoErrore = e.message;
       for (const [, p] of inSospeso) p.reject(e);
       inSospeso.clear();
+    };
+    w.on('error', (e) => {
+      stato.ultimoErrore = e.message;
+      rifiutaTutte(e);
     });
+    // un'uscita senza 'error' (terminate, process.exit nel worker) lasciava appese
+    // le richieste in volo
+    w.on('exit', (code) => rifiutaTutte(new Error('motore di analisi terminato (codice ' + code + ')')));
 
     return {
       pronto,
@@ -341,6 +353,7 @@ function createAudioFeatureService(options) {
     }
 
     stato.attivo = true;
+    interrotta = false;
     stato.fatti = 0;
     stato.saltati = 0;
     stato.errori = 0;
@@ -378,7 +391,7 @@ function createAudioFeatureService(options) {
         // blocca gli altri (una divisione in blocchi fissi lo farebbe).
         let cursore = 0;
         async function consuma(p) {
-          while (stato.attivo && p.vivo()) {
+          while (!interrotta && p.vivo()) {
             const i = cursore++;
             if (i >= daFare.length) return;
             const b = daFare[i];
@@ -398,11 +411,11 @@ function createAudioFeatureService(options) {
         await Promise.all(pool.map(consuma));
 
         cache.salva();
-        if (stato.attivo && !pool.some((p) => p.vivo())) {
+        if (!interrotta && !pool.some((p) => p.vivo())) {
           // i worker sono morti prima di finire la lista: non e' un completamento
           stato.messaggio = 'Analisi interrotta: il motore di analisi è terminato in modo anomalo';
         } else {
-          stato.messaggio = stato.attivo ? 'Analisi completata' : 'Analisi interrotta';
+          stato.messaggio = interrotta ? 'Analisi interrotta' : 'Analisi completata';
         }
       } catch (e) {
         stato.messaggio = 'Analisi non riuscita: ' + e.message;
@@ -420,7 +433,7 @@ function createAudioFeatureService(options) {
 
   function fermaAnalisi() {
     if (!stato.attivo) return { ok: false, error: 'Nessuna analisi in corso' };
-    stato.attivo = false;
+    interrotta = true;
     stato.messaggio = 'Interruzione…';
     return { ok: true };
   }

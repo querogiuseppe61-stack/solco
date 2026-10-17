@@ -653,4 +653,4 @@ function createWebInfoService(options) {
   return { albumInfo, artistInfo, aiStatus, chatJSON, verifyOpenRouterKey, listOpenRouterModels, loadAiConfig };
 }
 
-module.exports = { createWebInfoService, normalize };
+module.exports = { createWebInfoService, normalize, extractJson, escapeLucene, relevantWikipediaPage };
